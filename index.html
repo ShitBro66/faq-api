@@ -1,16 +1,409 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>FAQ 后端接口文档整理</title><style>
-:root{--text:#202124;--muted:#667085;--line:#d8dee9;--bg:#f6f8fb;--card:#fff;--accent:#e65a1d}*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif;color:var(--text);background:var(--bg);line-height:1.6}header{padding:28px 36px;background:#111318;color:#fff}header h1{margin:0 0 8px;font-size:28px}header p{margin:0;color:#d0d5dd}main{max-width:1280px;margin:0 auto;padding:24px 28px 60px}section{margin:0 0 22px}.api-card,.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}h2{margin:0 0 8px;font-size:20px}h3{margin:18px 0 8px;font-size:15px;color:#344054}.subline,.muted{color:var(--muted);font-size:13px}.endpoint{display:flex;gap:10px;align-items:center;padding:10px 12px;background:#fff7f3;border:1px solid #ffd8c7;border-radius:6px;margin:12px 0;overflow-x:auto}.method{min-width:54px;text-align:center;padding:2px 8px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700;font-size:12px}code{font-family:Consolas,Monaco,monospace;color:#b42318}table{width:100%;border-collapse:collapse;margin:8px 0 12px;background:#fff}th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}th{background:#f2f4f7;font-weight:600}pre{white-space:pre-wrap;word-break:break-word;max-height:520px;overflow:auto;margin:8px 0 0;padding:12px;background:#0f172a;color:#e5e7eb;border-radius:6px;font-size:12px}a{color:#1a73e8;text-decoration:none}a:hover{text-decoration:underline}ol{padding-left:22px}li{margin:6px 0}@media(max-width:800px){main{padding:16px}.endpoint{align-items:flex-start;flex-direction:column}}
-</style></head><body><header><h1>FAQ 后端接口文档整理</h1><p>来源：ShowDoc 页面接口，整理时间：2026-05-25。token 示例已省略。</p></header><main><section class="panel"><h2>接口总览</h2><table><thead><tr><th>文档</th><th>方法</th><th>接口路径</th><th>ShowDoc 标题</th></tr></thead><tbody><tr><td><a href="#api-0">获取左侧菜单详情</a></td><td>GET</td><td><code>/faq/getFaqMenu</code></td><td>获取左侧菜单</td></tr><tr><td><a href="#api-1">左侧菜单栏编辑</a></td><td>POST</td><td><code>/faq/editFaqMenu</code></td><td>左侧菜单栏编辑</td></tr><tr><td><a href="#api-2">FAQ分类模块编辑</a></td><td>POST</td><td><code>/faq/editFaqCate</code></td><td>FAQ分类模块增删改</td></tr><tr><td><a href="#api-3">FAQ分类中FAQ的编辑</a></td><td>POST</td><td><code>/faq/editFaqItem</code></td><td>FAQ分类中FAQ的增删改</td></tr><tr><td><a href="#api-4">FAQ博客编辑</a></td><td>POST</td><td><code>/faq/editFaqLatestBlog</code></td><td>FAQ博客增删改</td></tr><tr><td><a href="#api-5">FAQ受欢迎文章编辑</a></td><td>POST</td><td><code>/faq/editFaqPopularArticle</code></td><td>FAQ受欢迎文章编辑</td></tr><tr><td><a href="#api-6">FAQ用户卡片编辑</a></td><td>POST</td><td><code>/faq/editFaqAccount</code></td><td>FAQ用户卡片编辑</td></tr><tr><td><a href="#api-7">FAQ点赞</a></td><td>POST</td><td><code>/faq/addLikeRecord</code></td><td>FAQ点赞</td></tr><tr><td><a href="#api-8">获取当前用户的点赞详情</a></td><td>GET</td><td><code>/faq/getLoginUserIsLiked</code></td><td>查询当前用户已点赞信息</td></tr><tr><td><a href="#api-9">获取二级菜单的对应详情页</a></td><td>GET</td><td><code>/faq/getFaqConfigDetailByFaqId</code></td><td>获取对应二级菜单的配置详情页</td></tr><tr><td><a href="#api-10">推荐列表</a></td><td>GET</td><td><code>/faq/getIsCommendFaq</code></td><td>获取推荐FAQ</td></tr></tbody></table></section><section class="panel"><h2>管理页使用点分析</h2><table><thead><tr><th>管理页位置/动作</th><th>建议接口</th><th>说明</th></tr></thead><tbody><tr><td>打开 FAQ 管理弹窗、切换语言、刷新左侧菜单</td><td><code>GET /faq/getFaqMenu</code></td><td>按 language + proId 查询左侧菜单树；transList.menuName 用于菜单名称，descriptionText 对应描述文案。children 转成组件的 childList。</td></tr><tr><td>新增/编辑/删除左侧一级菜单和二级菜单</td><td><code>POST /faq/editFaqMenu</code></td><td>复用左侧菜单编辑表单；parentId=0 为一级菜单，二级菜单带 parentId 和 pageUrl；删除传 isDel=1。二级菜单同时提交 seoTitle、seoKeyword、seoDescription。</td></tr><tr><td>点击二级菜单“编辑FAQ内容”、重置内容</td><td><code>GET /faq/getFaqConfigDetailByFaqId</code></td><td>按 faqMenuId + proId 拉取详情，初始化 FAQ 分类、FAQ 条目、Popular Articles、My Account、Latest Blog Posts。</td></tr><tr><td>FAQ 分类新增/编辑/删除</td><td><code>POST /faq/editFaqCate</code></td><td>对应 FAQ 分类卡片；新增后接口若只返回 true，前端会自动刷新详情定位分类 id 后继续保存 FAQ。</td></tr><tr><td>FAQ 条目新增/编辑/删除</td><td><code>POST /faq/editFaqItem</code></td><td>对应分类下的 FAQ 卡片；likeCount 在后台只展示，但按接口文档仍随原值提交。</td></tr><tr><td>左侧菜单下方推荐列表、拖拽排序、保存推荐顺序</td><td><code>GET /faq/getIsCommendFaq</code> + <code>POST /faq/editFaqItem</code></td><td>按 uid + language + proId 查询 isRecommend=1 的 FAQ；拖拽后重排 sortNum，保存时复用 editFaqItem，并带回 id、categoryId、likeCount、isRecommend、sortNum、title、subTitle、text。</td></tr><tr><td>Popular Articles 新增/编辑/删除</td><td><code>POST /faq/editFaqPopularArticle</code></td><td>对应 Popular Articles 列表；sortNo 按前端顺序提交。</td></tr><tr><td>My Account 新增/编辑/删除</td><td><code>POST /faq/editFaqAccount</code></td><td>对应 My Account 用户卡片；详情页按 faqAccountList 读取，保存字段为 imageUrl、jumpLink、imageAlt、title。</td></tr><tr><td>Latest Blog Posts 新增/编辑/删除</td><td><code>POST /faq/editFaqLatestBlog</code></td><td>对应 Latest Blog Posts 列表；字段为 imageUrl、jumpLink、imageAlt、title、subTitle。</td></tr><tr><td>FAQ 点赞/取消点赞</td><td><code>POST /faq/addLikeRecord</code></td><td>前台用户行为接口；后台管理页不调用，只展示 likeCount。</td></tr><tr><td>当前用户点赞详情</td><td><code>GET /faq/getLoginUserIsLiked</code></td><td>前台用于判断登录用户或游客哪些 FAQ 已点赞；后台管理页暂不需要。</td></tr></tbody></table></section><section class="panel"><h2>仍需确认的问题</h2><ol><li>Popular Articles、My Account、Latest Blog Posts 三个模块标题现在支持编辑，但接口文档没有标题字段；这些标题仍需要确认存在哪个接口、哪个字段。</li><li>getFaqConfigDetailByFaqId 若要回显 My Account，请返回 faqAccountList，字段结构应与 editFaqAccount 一致并包含 transList。</li><li>editFaqCate 新增返回 data=true 时，前端已做二次刷新定位；若后端能返回 data.id，可减少一次请求。</li><li>所有 edit 接口删除是否统一传 isDel=1，并且其他字段是否必须完整传入，仍建议后端补充说明。</li><li>getIsCommendFaq 的 ShowDoc 示例未展示 sortNum，但联调需求说明推荐列表会返回 sortNum；管理页按真实返回字段排序并保存。</li></ol></section><section class="api-card" id="api-0">
-    <h2>1. 获取左侧菜单详情</h2>
-    <div class="subline">ShowDoc 标题：获取左侧菜单 · <a href="http://47.112.98.200:4999/web/#/p/9b77da40b2260a5b126dc7bbe5c2094a" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getFaqMenu?language=en-us</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td></td></tr></tbody></table>
-    <h3>JSON Body 字段</h3><p class="muted">无</p>
-    <h3>返回示例</h3><pre>{
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<title>FAQ 后端接口文档整理</title>
+		<style>
+			:root {
+				--text: #202124;
+				--muted: #667085;
+				--line: #d8dee9;
+				--bg: #f6f8fb;
+				--card: #fff;
+				--accent: #e65a1d;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+				color: var(--text);
+				background: var(--bg);
+				line-height: 1.6;
+			}
+			header {
+				padding: 28px 36px;
+				background: #111318;
+				color: #fff;
+			}
+			header h1 {
+				margin: 0 0 8px;
+				font-size: 28px;
+			}
+			header p {
+				margin: 0;
+				color: #d0d5dd;
+			}
+			main {
+				max-width: 1280px;
+				margin: 0 auto;
+				padding: 24px 28px 60px;
+			}
+			section {
+				margin: 0 0 22px;
+			}
+			.api-card,
+			.panel {
+				background: var(--card);
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				padding: 20px;
+				box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+			}
+			h2 {
+				margin: 0 0 8px;
+				font-size: 20px;
+			}
+			h3 {
+				margin: 18px 0 8px;
+				font-size: 15px;
+				color: #344054;
+			}
+			.subline,
+			.muted {
+				color: var(--muted);
+				font-size: 13px;
+			}
+			.endpoint {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+				padding: 10px 12px;
+				background: #fff7f3;
+				border: 1px solid #ffd8c7;
+				border-radius: 6px;
+				margin: 12px 0;
+				overflow-x: auto;
+			}
+			.method {
+				min-width: 54px;
+				text-align: center;
+				padding: 2px 8px;
+				border-radius: 999px;
+				background: var(--accent);
+				color: #fff;
+				font-weight: 700;
+				font-size: 12px;
+			}
+			code {
+				font-family: Consolas, Monaco, monospace;
+				color: #b42318;
+			}
+			.new-field {
+				color: #067647;
+				font-weight: 700;
+			}
+			code.new-field {
+				color: #067647;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 8px 0 12px;
+				background: #fff;
+			}
+			th,
+			td {
+				border: 1px solid var(--line);
+				padding: 8px 10px;
+				vertical-align: top;
+				text-align: left;
+			}
+			th {
+				background: #f2f4f7;
+				font-weight: 600;
+			}
+			pre {
+				white-space: pre-wrap;
+				word-break: break-word;
+				max-height: 520px;
+				overflow: auto;
+				margin: 8px 0 0;
+				padding: 12px;
+				background: #0f172a;
+				color: #e5e7eb;
+				border-radius: 6px;
+				font-size: 12px;
+			}
+			a {
+				color: #1a73e8;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+			ol {
+				padding-left: 22px;
+			}
+			li {
+				margin: 6px 0;
+			}
+			@media (max-width: 800px) {
+				main {
+					padding: 16px;
+				}
+				.endpoint {
+					align-items: flex-start;
+					flex-direction: column;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>FAQ 后端接口文档整理</h1>
+			<p>来源：ShowDoc 页面接口，整理时间：2026-05-25。token 示例已省略。</p>
+		</header>
+		<main>
+			<section class="panel">
+				<h2>接口总览</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>文档</th>
+							<th>方法</th>
+							<th>接口路径</th>
+							<th>ShowDoc 标题</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><a href="#api-0">获取左侧菜单详情</a></td>
+							<td>GET</td>
+							<td><code>/faq/getFaqMenu</code></td>
+							<td>获取左侧菜单</td>
+						</tr>
+						<tr>
+							<td><a href="#api-1">左侧菜单栏编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqMenu</code></td>
+							<td>左侧菜单栏编辑</td>
+						</tr>
+						<tr>
+							<td><a href="#api-2">FAQ分类模块编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqCate</code></td>
+							<td>FAQ分类模块增删改</td>
+						</tr>
+						<tr>
+							<td><a href="#api-3">FAQ分类中FAQ的编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqItem</code></td>
+							<td>FAQ分类中FAQ的增删改</td>
+						</tr>
+						<tr>
+							<td><a href="#api-4">FAQ博客编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqLatestBlog</code></td>
+							<td>FAQ博客增删改</td>
+						</tr>
+						<tr>
+							<td><a href="#api-5">FAQ受欢迎文章编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqPopularArticle</code></td>
+							<td>FAQ受欢迎文章编辑</td>
+						</tr>
+						<tr>
+							<td><a href="#api-6">FAQ用户卡片编辑</a></td>
+							<td>POST</td>
+							<td><code>/faq/editFaqAccount</code></td>
+							<td>FAQ用户卡片编辑</td>
+						</tr>
+						<tr>
+							<td><a href="#api-7">FAQ点赞</a></td>
+							<td>POST</td>
+							<td><code>/faq/addLikeRecord</code></td>
+							<td>FAQ点赞</td>
+						</tr>
+						<tr>
+							<td><a href="#api-8">获取当前用户的点赞详情</a></td>
+							<td>GET</td>
+							<td><code>/faq/getLoginUserIsLiked</code></td>
+							<td>查询当前用户已点赞信息</td>
+						</tr>
+						<tr>
+							<td><a href="#api-9">获取二级菜单的对应详情页</a></td>
+							<td>GET</td>
+							<td><code>/faq/getFaqConfigDetailByFaqId</code></td>
+							<td>获取对应二级菜单的配置详情页</td>
+						</tr>
+						<tr>
+							<td><a href="#api-10">推荐列表</a></td>
+							<td>GET</td>
+							<td><code>/faq/getIsCommendFaq</code></td>
+							<td>获取推荐FAQ</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			<section class="panel">
+				<h2>管理页使用点分析</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>管理页位置/动作</th>
+							<th>建议接口</th>
+							<th>说明</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>打开 FAQ 管理弹窗、切换语言、刷新左侧菜单</td>
+							<td><code>GET /faq/getFaqMenu</code></td>
+							<td>
+								按 language + proId 查询左侧菜单树；transList.menuName 用于菜单名称，descriptionText
+								对应描述文案。children 转成组件的 childList。
+							</td>
+						</tr>
+						<tr>
+							<td>新增/编辑/删除左侧一级菜单和二级菜单</td>
+							<td><code>POST /faq/editFaqMenu</code></td>
+							<td>
+								复用左侧菜单编辑表单；parentId=0 为一级菜单，二级菜单带 parentId 和 pageUrl；删除传
+								isDel=1。二级菜单同时提交 seoTitle、seoKeyword、seoDescription。
+							</td>
+						</tr>
+						<tr>
+							<td>点击二级菜单“编辑FAQ内容”、重置内容</td>
+							<td><code>GET /faq/getFaqConfigDetailByFaqId</code></td>
+							<td>
+								按 faqMenuId + visitorUuid + proId 拉取详情，初始化 FAQ 分类、FAQ 条目、Popular
+								Articles、My Account、Latest Blog Posts；Popular Articles 和 Latest Blog Posts
+								分别从 faqArticleParentVo、faqBlogParentVo 读取标题和列表。
+							</td>
+						</tr>
+						<tr>
+							<td>FAQ 分类新增/编辑/删除</td>
+							<td><code>POST /faq/editFaqCate</code></td>
+							<td>
+								对应 FAQ 分类卡片；新增后接口若只返回 true，前端会自动刷新详情定位分类 id 后继续保存
+								FAQ。
+							</td>
+						</tr>
+						<tr>
+							<td>FAQ 条目新增/编辑/删除</td>
+							<td><code>POST /faq/editFaqItem</code></td>
+							<td>对应分类下的 FAQ 卡片；likeCount 在后台只展示，但按接口文档仍随原值提交。</td>
+						</tr>
+						<tr>
+							<td>左侧菜单下方推荐列表、拖拽排序、保存推荐顺序</td>
+							<td><code>GET /faq/getIsCommendFaq</code> + <code>POST /faq/editFaqItem</code></td>
+							<td>
+								按 uid + language + proId 查询 isRecommend=1 的 FAQ；拖拽后重排 sortNum，保存时复用
+								editFaqItem，并带回
+								id、categoryId、likeCount、isRecommend、sortNum、title、subTitle、text。
+							</td>
+						</tr>
+						<tr>
+							<td>Popular Articles 新增/编辑/删除</td>
+							<td><code>POST /faq/editFaqPopularArticle</code></td>
+							<td>对应 Popular Articles 列表；sortNo 按前端顺序提交，模块标题通过 parentId + name 保存。</td>
+						</tr>
+						<tr>
+							<td>My Account 新增/编辑/删除</td>
+							<td><code>POST /faq/editFaqAccount</code></td>
+							<td>
+								对应 My Account 用户卡片；详情页按 faqAccountList 读取，保存字段为
+								imageUrl、jumpLink、imageAlt、title。
+							</td>
+						</tr>
+						<tr>
+							<td>Latest Blog Posts 新增/编辑/删除</td>
+							<td><code>POST /faq/editFaqLatestBlog</code></td>
+							<td>
+								对应 Latest Blog Posts 列表；字段为 imageUrl、jumpLink、imageAlt、title、subTitle，模块标题通过
+								parentId + name 保存。
+							</td>
+						</tr>
+						<tr>
+							<td>FAQ 点赞/取消点赞</td>
+							<td><code>POST /faq/addLikeRecord</code></td>
+							<td>前台用户行为接口；后台管理页不调用，只展示 likeCount。</td>
+						</tr>
+						<tr>
+							<td>当前用户点赞详情</td>
+							<td><code>GET /faq/getLoginUserIsLiked</code></td>
+							<td>前台用于判断登录用户或游客哪些 FAQ 已点赞；后台管理页暂不需要。</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+			<section class="panel">
+				<h2>仍需确认的问题</h2>
+				<ol>
+					<li>My Account 标题当前只展示默认值，不提供编辑入口；Popular Articles 和 Latest Blog Posts 标题通过各自父对象 name 保存。</li>
+					<li>
+						getFaqConfigDetailByFaqId 若要回显 My Account，请返回 faqAccountList，字段结构应与
+						editFaqAccount 一致并包含 transList。
+					</li>
+					<li>
+						editFaqCate 新增返回 data=true 时，前端已做二次刷新定位；若后端能返回 data.id，可减少一次请求。
+					</li>
+					<li>所有 edit 接口删除是否统一传 isDel=1，并且其他字段是否必须完整传入，仍建议后端补充说明。</li>
+					<li>
+						getIsCommendFaq 的 ShowDoc 示例未展示 sortNum，但联调需求说明推荐列表会返回
+						sortNum；管理页按真实返回字段排序并保存。
+					</li>
+				</ol>
+			</section>
+			<section class="api-card" id="api-0">
+				<h2>1. 获取左侧菜单详情</h2>
+				<div class="subline">
+					ShowDoc 标题：获取左侧菜单 ·
+					<a href="http://47.112.98.200:4999/web/#/p/9b77da40b2260a5b126dc7bbe5c2094a" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getFaqMenu?language=en-us</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>JSON Body 字段</h3>
+				<p class="muted">无</p>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: [
@@ -37,129 +430,878 @@
   ],
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-1">
-    <h2>2. 左侧菜单栏编辑</h2>
-    <div class="subline">ShowDoc 标题：左侧菜单栏编辑 · <a href="http://47.112.98.200:4999/web/#/p/d831896697baf67636c3907344b917d2" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqMenu</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>id</code></td><td>是</td><td>string</td><td></td><td></td></tr><tr><td><code>proId</code></td><td>是</td><td>number</td><td>1</td><td></td></tr><tr><td><code>parentId</code></td><td>是</td><td>number</td><td></td><td></td></tr><tr><td><code>pageUrl</code></td><td>是</td><td>string</td><td>/faq/order</td><td></td></tr><tr><td><code>sortNum</code></td><td>是</td><td>number</td><td>1</td><td></td></tr><tr><td><code>isDisplay</code></td><td>是</td><td>number</td><td>1</td><td></td></tr><tr><td><code>menu_id</code></td><td>是</td><td>string</td><td></td><td></td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td></td></tr><tr><td><code>menuName</code></td><td>是</td><td>string</td><td>Order FAQ</td><td></td></tr><tr><td><code>description</code></td><td>是</td><td>string</td><td>Order related help</td><td></td></tr><tr><td><code>seoTitle</code></td><td>否</td><td>string</td><td>Custom Enamel Pins | Low Price Customization | Online Order</td><td>SEO 标题</td></tr><tr><td><code>seoKeyword</code></td><td>否</td><td>string</td><td>Custom Enamel Pins, Enamel Pins, Custom Pins</td><td>SEO 关键词</td></tr><tr><td><code>seoDescription</code></td><td>否</td><td>string</td><td>A variety of classic custom enamel pins are displayed and customized.</td><td>SEO 描述</td></tr><tr><td><code>isDel</code></td><td>是</td><td>string</td><td></td><td>是否删除 1-是</td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-1">
+				<h2>2. 左侧菜单栏编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：左侧菜单栏编辑 ·
+					<a href="http://47.112.98.200:4999/web/#/p/d831896697baf67636c3907344b917d2" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqMenu</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>id</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>proId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>parentId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>pageUrl</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>/faq/order</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>sortNum</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>isDisplay</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>menu_id</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>menuName</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Order FAQ</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>description</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Order related help</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>seoTitle</code></td>
+							<td>否</td>
+							<td>string</td>
+							<td>Custom Enamel Pins | Low Price Customization | Online Order</td>
+							<td>SEO 标题</td>
+						</tr>
+						<tr>
+							<td><code>seoKeyword</code></td>
+							<td>否</td>
+							<td>string</td>
+							<td>Custom Enamel Pins, Enamel Pins, Custom Pins</td>
+							<td>SEO 关键词</td>
+						</tr>
+						<tr>
+							<td><code>seoDescription</code></td>
+							<td>否</td>
+							<td>string</td>
+							<td>A variety of classic custom enamel pins are displayed and customized.</td>
+							<td>SEO 描述</td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>是否删除 1-是</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-2">
-    <h2>3. FAQ分类模块编辑</h2>
-    <div class="subline">ShowDoc 标题：FAQ分类模块增删改 · <a href="http://47.112.98.200:4999/web/#/p/3fd1665a042b7248432022a9bc276d01" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqCate</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>menuId</code></td><td>是</td><td>number</td><td>1</td><td>菜单ID</td></tr><tr><td><code>sortNum</code></td><td>是</td><td>number</td><td>1</td><td>排序</td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td>语言</td></tr><tr><td><code>categoryName</code></td><td>是</td><td>string</td><td>Orders</td><td>分类名称</td></tr><tr><td><code>isDel</code></td><td>是</td><td>string</td><td></td><td>0-否 1-是 </td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-2">
+				<h2>3. FAQ分类模块编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ分类模块增删改 ·
+					<a href="http://47.112.98.200:4999/web/#/p/3fd1665a042b7248432022a9bc276d01" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqCate</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>menuId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>菜单ID</td>
+						</tr>
+						<tr>
+							<td><code>sortNum</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>排序</td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td>语言</td>
+						</tr>
+						<tr>
+							<td><code>categoryName</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Orders</td>
+							<td>分类名称</td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>0-否 1-是</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-3">
-    <h2>4. FAQ分类中FAQ的编辑</h2>
-    <div class="subline">ShowDoc 标题：FAQ分类中FAQ的增删改 · <a href="http://47.112.98.200:4999/web/#/p/2a34b1a7bd3b569760f4762174a22311" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqItem</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>id</code></td><td>否</td><td>number/string</td><td>1</td><td>FAQ ID，新增可为空</td></tr><tr><td><code>proId</code></td><td>是</td><td>number/string</td><td>1</td><td>当前站点 ID</td></tr><tr><td><code>categoryId</code></td><td>是</td><td>number</td><td>1</td><td>分类ID</td></tr><tr><td><code>sortNum</code></td><td>否</td><td>number</td><td>1</td><td>推荐列表拖拽排序使用；ShowDoc 原示例未展示</td></tr><tr><td><code>likeCount</code></td><td>是</td><td>number</td><td>6</td><td>点赞总数</td></tr><tr><td><code>isShowLikeLogo</code></td><td>是</td><td>number</td><td>1</td><td>是否展示点赞标识</td></tr><tr><td><code>isRecommend</code></td><td>否</td><td>number</td><td>1</td><td>是否推荐 0-否 1-是</td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td>语言</td></tr><tr><td><code>title</code></td><td>是</td><td>string</td><td>How do I place an order?</td><td>标题</td></tr><tr><td><code>subTitle</code></td><td>是</td><td>string</td><td>Order process</td><td>副标题</td></tr><tr><td><code>text</code></td><td>是</td><td>string</td><td>&lt;p&gt;FAQ content&lt;/p&gt;</td><td></td></tr><tr><td><code>isDel</code></td><td>是</td><td>string</td><td></td><td>是否为删除操作 0-否1-是</td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-3">
+				<h2>4. FAQ分类中FAQ的编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ分类中FAQ的增删改 ·
+					<a href="http://47.112.98.200:4999/web/#/p/2a34b1a7bd3b569760f4762174a22311" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqItem</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>id</code></td>
+							<td>否</td>
+							<td>number/string</td>
+							<td>1</td>
+							<td>FAQ ID，新增可为空</td>
+						</tr>
+						<tr>
+							<td><code>proId</code></td>
+							<td>是</td>
+							<td>number/string</td>
+							<td>1</td>
+							<td>当前站点 ID</td>
+						</tr>
+						<tr>
+							<td><code>categoryId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>分类ID</td>
+						</tr>
+						<tr>
+							<td><code>sortNum</code></td>
+							<td>否</td>
+							<td>number</td>
+							<td>1</td>
+							<td>推荐列表拖拽排序使用；ShowDoc 原示例未展示</td>
+						</tr>
+						<tr>
+							<td><code>likeCount</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>6</td>
+							<td>点赞总数</td>
+						</tr>
+						<tr>
+							<td><code>isShowLikeLogo</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>是否展示点赞标识</td>
+						</tr>
+						<tr>
+							<td><code>isRecommend</code></td>
+							<td>否</td>
+							<td>number</td>
+							<td>1</td>
+							<td>是否推荐 0-否 1-是</td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td>语言</td>
+						</tr>
+						<tr>
+							<td><code>title</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>How do I place an order?</td>
+							<td>标题</td>
+						</tr>
+						<tr>
+							<td><code>subTitle</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Order process</td>
+							<td>副标题</td>
+						</tr>
+						<tr>
+							<td><code>text</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>&lt;p&gt;FAQ content&lt;/p&gt;</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>是否为删除操作 0-否1-是</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-4">
-    <h2>5. FAQ博客编辑</h2>
-    <div class="subline">ShowDoc 标题：FAQ博客增删改 · <a href="http://47.112.98.200:4999/web/#/p/5e17d9af1bdc8a9359a7cb06aa44268a" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqLatestBlog</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>id</code></td><td>是</td><td>string</td><td></td><td>新增不传</td></tr><tr><td><code>menuId</code></td><td>是</td><td>number</td><td>12</td><td>菜单ID</td></tr><tr><td><code>imageUrl</code></td><td>是</td><td>string</td><td>https://cdn.xxx.com/blog-cover.jpg</td><td></td></tr><tr><td><code>jumpLink</code></td><td>是</td><td>string</td><td>/blog/new-arrivals</td><td></td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td></td></tr><tr><td><code>imageAlt</code></td><td>是</td><td>string</td><td>new arrivals cover</td><td></td></tr><tr><td><code>title</code></td><td>是</td><td>string</td><td>New Arrivals</td><td></td></tr><tr><td><code>subTitle</code></td><td>是</td><td>string</td><td>Spring collection</td><td></td></tr><tr><td><code>isDel</code></td><td>是</td><td>string</td><td></td><td></td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-4">
+				<h2>5. FAQ博客编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ博客增删改 ·
+					<a href="http://47.112.98.200:4999/web/#/p/e960f3222b8994a5c5f1f94ea18da0c0" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqLatestBlog</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>id</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>新增不传</td>
+						</tr>
+						<tr>
+							<td><code>menuId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>12</td>
+							<td>菜单ID</td>
+						</tr>
+						<tr>
+							<td><code>imageUrl</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>https://cdn.xxx.com/blog-cover.jpg</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>jumpLink</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>/blog/new-arrivals</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>imageAlt</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>new arrivals cover</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>title</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>New Arrivals</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>subTitle</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Spring collection</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code class="new-field">parentId</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>对应的外层ID</td>
+						</tr>
+						<tr>
+							<td><code class="new-field">name</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>first</td>
+							<td>外层名称</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-5">
-    <h2>6. FAQ受欢迎文章编辑</h2>
-    <div class="subline">ShowDoc 标题：FAQ受欢迎文章编辑 · <a href="http://47.112.98.200:4999/web/#/p/e6c506d6bbbdc756c867b897e82fdcac" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqPopularArticle</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>menuId</code></td><td>是</td><td>number</td><td>12</td><td></td></tr><tr><td><code>sortNo</code></td><td>是</td><td>number</td><td>1</td><td></td></tr><tr><td><code>jumpLink</code></td><td>是</td><td>string</td><td>/blog/shipping-policy</td><td></td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td></td></tr><tr><td><code>title</code></td><td>是</td><td>string</td><td>Shipping Policy</td><td></td></tr><tr><td><code>isDel</code></td><td>是</td><td>string</td><td></td><td></td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-5">
+				<h2>6. FAQ受欢迎文章编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ受欢迎文章编辑 ·
+					<a href="http://47.112.98.200:4999/web/#/p/1bfef9f5b16bd30fd4b507746a286b81" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqPopularArticle</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>menuId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>12</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>sortNo</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>jumpLink</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>/blog/shipping-policy</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>title</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>Shipping Policy</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code class="new-field">parentId</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>外层ID</td>
+						</tr>
+						<tr>
+							<td><code class="new-field">name</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>first</td>
+							<td>外层名称</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-6">
-    <h2>7. FAQ用户卡片编辑</h2>
-    <div class="subline">ShowDoc 标题：FAQ用户卡片编辑 · <a href="http://47.112.98.200:4999/web/#/p/f7883a3049bc41efafe66c1aa1fa26c7" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqAccount</code></div>
-    
-    
-    <h3>Headers</h3><p class="muted">无</p>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>id</code></td><td>是</td><td>string</td><td></td><td>用户卡片ID</td></tr><tr><td><code>menuId</code></td><td>是</td><td>number</td><td>1</td><td>菜单ID</td></tr><tr><td><code>sortNo</code></td><td>是</td><td>number</td><td>1</td><td>排序</td></tr><tr><td><code>imageUrl</code></td><td>是</td><td>string</td><td>https://cdn.xxx.com/faq/account/banner1.png</td><td>图片路径</td></tr><tr><td><code>jumpLink</code></td><td>是</td><td>string</td><td>https://www.xxx.com/my-account/orders</td><td>跳转链接</td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td>语言</td></tr><tr><td><code>imageAlt</code></td><td>是</td><td>string</td><td>My orders banner</td><td>图片副标签</td></tr><tr><td><code>title</code></td><td>是</td><td>string</td><td>My Orders</td><td>标题</td></tr><tr><td><code>isDel</code></td><td>是</td><td>number</td><td></td><td>是否删除 0-否 1-是</td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-6">
+				<h2>7. FAQ用户卡片编辑</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ用户卡片编辑 ·
+					<a href="http://47.112.98.200:4999/web/#/p/f7883a3049bc41efafe66c1aa1fa26c7" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/editFaqAccount</code>
+				</div>
+
+				<h3>Headers</h3>
+				<p class="muted">无</p>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>id</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>用户卡片ID</td>
+						</tr>
+						<tr>
+							<td><code>menuId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>菜单ID</td>
+						</tr>
+						<tr>
+							<td><code>sortNo</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>排序</td>
+						</tr>
+						<tr>
+							<td><code>imageUrl</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>https://cdn.xxx.com/faq/account/banner1.png</td>
+							<td>图片路径</td>
+						</tr>
+						<tr>
+							<td><code>jumpLink</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>https://www.xxx.com/my-account/orders</td>
+							<td>跳转链接</td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td>语言</td>
+						</tr>
+						<tr>
+							<td><code>imageAlt</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>My orders banner</td>
+							<td>图片副标签</td>
+						</tr>
+						<tr>
+							<td><code>title</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>My Orders</td>
+							<td>标题</td>
+						</tr>
+						<tr>
+							<td><code>isDel</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td></td>
+							<td>是否删除 0-否 1-是</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-7">
-    <h2>8. FAQ点赞</h2>
-    <div class="subline">ShowDoc 标题：FAQ点赞 · <a href="http://47.112.98.200:4999/web/#/p/39816299d4a6ae21f08b612a133924ea" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/addLikeRecord</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><p class="muted">无</p>
-    <h3>JSON Body 字段</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>faqItemId</code></td><td>是</td><td>number</td><td>1001</td><td>faq分类中faq的id</td></tr><tr><td><code>identityType</code></td><td>是</td><td>number</td><td>2</td><td>点赞用户类型 1-用户 2-游客</td></tr><tr><td><code>identityKey</code></td><td>是</td><td>string</td><td>visitor-uuid-123</td><td>点赞用户唯一标识用户id或游客Uuid</td></tr><tr><td><code>status</code></td><td>是</td><td>number</td><td>1</td><td>是否点赞 0-否 1-已点赞</td></tr></tbody></table>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-7">
+				<h2>8. FAQ点赞</h2>
+				<div class="subline">
+					ShowDoc 标题：FAQ点赞 ·
+					<a href="http://47.112.98.200:4999/web/#/p/39816299d4a6ae21f08b612a133924ea" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">POST</span><code>https://products-api-dev.gs-souvenir.com/faq/addLikeRecord</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<p class="muted">无</p>
+				<h3>JSON Body 字段</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>faqItemId</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1001</td>
+							<td>faq分类中faq的id</td>
+						</tr>
+						<tr>
+							<td><code>identityType</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>2</td>
+							<td>点赞用户类型 1-用户 2-游客</td>
+						</tr>
+						<tr>
+							<td><code>identityKey</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>visitor-uuid-123</td>
+							<td>点赞用户唯一标识用户id或游客Uuid</td>
+						</tr>
+						<tr>
+							<td><code>status</code></td>
+							<td>是</td>
+							<td>number</td>
+							<td>1</td>
+							<td>是否点赞 0-否 1-已点赞</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: true,
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-8">
-    <h2>9. 获取当前用户的点赞详情</h2>
-    <div class="subline">ShowDoc 标题：查询当前用户已点赞信息 · <a href="http://47.112.98.200:4999/web/#/p/ca2b6dddf030e99dad134edb3abc74da" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getLoginUserIsLiked?visitorUuid=</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>visitorUuid</code></td><td>是</td><td>string</td><td></td><td>游客uuid(游客登录时必传)</td></tr></tbody></table>
-    <h3>JSON Body 字段</h3><p class="muted">无</p>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-8">
+				<h2>9. 获取当前用户的点赞详情</h2>
+				<div class="subline">
+					ShowDoc 标题：查询当前用户已点赞信息 ·
+					<a href="http://47.112.98.200:4999/web/#/p/ca2b6dddf030e99dad134edb3abc74da" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getLoginUserIsLiked?visitorUuid=</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code class="new-field">visitorUuid</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td></td>
+							<td>游客uuid(游客登录时必传)</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>JSON Body 字段</h3>
+				<p class="muted">无</p>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: [
@@ -175,61 +1317,172 @@
   ],
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-9">
-    <h2>10. 获取二级菜单的对应详情页</h2>
-    <div class="subline">ShowDoc 标题：获取对应二级菜单的配置详情页 · <a href="http://47.112.98.200:4999/web/#/p/6bf3dfb2c2be3dabd62a91fbe8cf4675" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getFaqConfigDetailByFaqId?faqMenuId=1</code></div>
-    
-    
-    <h3>Headers</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>token</code></td><td>是</td><td>string</td><td>已省略：登录 token</td><td></td></tr></tbody></table>
-    <h3>Query 参数</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>faqMenuId</code></td><td>是</td><td>string</td><td>1</td><td>二级菜单ID</td></tr></tbody></table>
-    <h3>JSON Body 字段</h3><p class="muted">无</p>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-9">
+				<h2>10. 获取二级菜单的对应详情页</h2>
+				<div class="subline">
+					ShowDoc 标题：获取对应二级菜单的配置详情页 ·
+					<a href="http://47.112.98.200:4999/web/#/p/1f0c49d46d718459882004bfca77c42b" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getFaqConfigDetailByFaqId?faqMenuId=6&amp;visitorUuid=1&amp;proId=1</code>
+				</div>
+
+				<h3>Headers</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>token</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>已省略：登录 token</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>Query 参数</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>faqMenuId</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>6</td>
+							<td>二级菜单ID</td>
+						</tr>
+						<tr>
+							<td><code class="new-field">visitorUuid</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><code class="new-field">proId</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>1</td>
+							<td></td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>JSON Body 字段</h3>
+				<p class="muted">无</p>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: {
-    &quot;id&quot;: 1,
-    &quot;proId&quot;: 1,
-    &quot;parentId&quot;: 0,
-    &quot;pageUrl&quot;: &quot;/faq/order&quot;,
+    &quot;id&quot;: 6,
+    <span class="new-field">&quot;proId&quot;</span>: 1,
+    &quot;parentId&quot;: 5,
+    &quot;pageUrl&quot;: &quot;/info/faq-help/order-and-account&quot;,
     &quot;sortNum&quot;: 1,
     &quot;isDisplay&quot;: 1,
+    <span class="new-field">&quot;faqArticleParentVo&quot;</span>: {
+      &quot;id&quot;: null,
+      &quot;menuId&quot;: null,
+      &quot;name&quot;: null,
+      <span class="new-field">&quot;faqPopularArticleList&quot;</span>: [
+        {
+          &quot;id&quot;: 2,
+          &quot;menuId&quot;: 6,
+          &quot;sortNo&quot;: 1,
+          &quot;jumpLink&quot;: &quot;test/11&quot;,
+          &quot;transList&quot;: [
+            {
+              &quot;id&quot;: 2,
+              &quot;articleId&quot;: 2,
+              &quot;language&quot;: &quot;en-us&quot;,
+              &quot;title&quot;: &quot;11&quot;
+            }
+          ]
+        }
+      ]
+    },
+    <span class="new-field">&quot;faqBlogParentVo&quot;</span>: {
+      &quot;id&quot;: null,
+      &quot;menuId&quot;: null,
+      &quot;name&quot;: null,
+      <span class="new-field">&quot;faqLatestBlogList&quot;</span>: [
+        {
+          &quot;id&quot;: 2,
+          &quot;menuId&quot;: 6,
+          &quot;imageUrl&quot;: &quot;https://static-oss.gs-souvenir.com/web/quoteManage/20260525/1_20260525p2nZsk.png&quot;,
+          &quot;jumpLink&quot;: &quot;&quot;,
+          &quot;transList&quot;: [
+            {
+              &quot;id&quot;: 2,
+              &quot;blogId&quot;: 2,
+              &quot;language&quot;: &quot;en-us&quot;,
+              &quot;imageAlt&quot;: &quot;11&quot;,
+              &quot;title&quot;: &quot;111&quot;,
+              &quot;subTitle&quot;: &quot;11&quot;
+            }
+          ]
+        }
+      ]
+    },
     &quot;menuTransList&quot;: [
       {
-        &quot;id&quot;: 1,
-        &quot;menuId&quot;: 1,
+        &quot;id&quot;: 6,
+        &quot;menuId&quot;: 6,
         &quot;language&quot;: &quot;en-us&quot;,
-        &quot;menuName&quot;: &quot;Order FAQ&quot;,
-        &quot;descriptionText&quot;: null
+        &quot;menuName&quot;: &quot;Order and Account&quot;,
+        &quot;descriptionText&quot;: &quot;Find answers to common questions about orders, accounts and managing your purchases.&quot;,
+        &quot;seoDescription&quot;: null,
+        &quot;seoKeyword&quot;: null,
+        &quot;seoTitle&quot;: null
       }
     ],
     &quot;faqCategoryList&quot;: [
       {
-        &quot;id&quot;: 1,
-        &quot;menuId&quot;: 1,
+        &quot;id&quot;: 14,
+        &quot;menuId&quot;: 6,
         &quot;sortNum&quot;: 1,
         &quot;transList&quot;: [
           {
-            &quot;id&quot;: 1,
-            &quot;categoryId&quot;: 1,
+            &quot;id&quot;: 14,
+            &quot;categoryId&quot;: 14,
             &quot;language&quot;: &quot;en-us&quot;,
-            &quot;categoryName&quot;: &quot;Orders&quot;
+            &quot;categoryName&quot;: &quot;111&quot;
           }
         ],
         &quot;faqItemList&quot;: [
           {
-            &quot;id&quot;: 1,
-            &quot;categoryId&quot;: 1,
-            &quot;likeCount&quot;: 6,
-            &quot;isShowLikeLogo&quot;: 1,
+            &quot;id&quot;: 6,
+            &quot;categoryId&quot;: 14,
+            &quot;sortNum&quot;: 1,
+            &quot;recommendSortNum&quot;: 1,
+            &quot;likeCount&quot;: 0,
+            &quot;isRecommend&quot;: 1,
+            &quot;isLiked&quot;: 0,
             &quot;transList&quot;: [
               {
-                &quot;id&quot;: 1,
-                &quot;faqItemId&quot;: 1,
+                &quot;id&quot;: 6,
+                &quot;faqItemId&quot;: 6,
                 &quot;language&quot;: &quot;en-us&quot;,
-                &quot;title&quot;: &quot;How do I place an order?&quot;,
-                &quot;subTitle&quot;: &quot;Order process&quot;,
+                &quot;title&quot;: &quot;[ Order ]&quot;,
+                &quot;subTitle&quot;: &quot;How can I start placing my order?&quot;,
                 &quot;text&quot;: &quot;&lt;p&gt;FAQ content&lt;/p&gt;&quot;
               }
             ]
@@ -237,20 +1490,64 @@
         ]
       }
     ],
-    &quot;faqPopularArticleList&quot;: [],
-    &quot;faqLatestBlogList&quot;: []
+    &quot;faqPopularArticleList&quot;: null,
+    &quot;faqLatestBlogList&quot;: null,
+    &quot;faqAccountList&quot;: []
   },
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section>
-<section class="api-card" id="api-10">
-    <h2>11. 推荐列表</h2>
-    <div class="subline">ShowDoc 标题：获取推荐FAQ · <a href="http://47.112.98.200:4999/web/#/p/9bf6e5f10d747ac0ce1e37f627e2891c" target="_blank">原文链接</a></div>
-    <div class="endpoint"><span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getIsCommendFaq?uid=1&amp;language=en-us&amp;proId=1</code></div>
-    <h3>Headers</h3><p class="muted">ShowDoc 未填写 header 字段；项目请求会继续走统一 request 封装携带登录 token。</p>
-    <h3>Query 参数</h3><table><thead><tr><th>字段</th><th>必填</th><th>类型</th><th>示例值</th><th>备注</th></tr></thead><tbody><tr><td><code>uid</code></td><td>是</td><td>string</td><td>1</td><td>当前用户 ID</td></tr><tr><td><code>language</code></td><td>是</td><td>string</td><td>en-us</td><td>语言</td></tr><tr><td><code>proId</code></td><td>是</td><td>string</td><td>1</td><td>接口参数使用 proId</td></tr></tbody></table>
-    <h3>JSON Body 字段</h3><p class="muted">无</p>
-    <h3>返回示例</h3><pre>{
+			</section>
+			<section class="api-card" id="api-10">
+				<h2>11. 推荐列表</h2>
+				<div class="subline">
+					ShowDoc 标题：获取推荐FAQ ·
+					<a href="http://47.112.98.200:4999/web/#/p/9bf6e5f10d747ac0ce1e37f627e2891c" target="_blank">原文链接</a>
+				</div>
+				<div class="endpoint">
+					<span class="method">GET</span><code>https://products-api-dev.gs-souvenir.com/faq/getIsCommendFaq?uid=1&amp;language=en-us&amp;proId=1</code>
+				</div>
+				<h3>Headers</h3>
+				<p class="muted">ShowDoc 未填写 header 字段；项目请求会继续走统一 request 封装携带登录 token。</p>
+				<h3>Query 参数</h3>
+				<table>
+					<thead>
+						<tr>
+							<th>字段</th>
+							<th>必填</th>
+							<th>类型</th>
+							<th>示例值</th>
+							<th>备注</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><code>uid</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>1</td>
+							<td>当前用户 ID</td>
+						</tr>
+						<tr>
+							<td><code>language</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>en-us</td>
+							<td>语言</td>
+						</tr>
+						<tr>
+							<td><code>proId</code></td>
+							<td>是</td>
+							<td>string</td>
+							<td>1</td>
+							<td>接口参数使用 proId</td>
+						</tr>
+					</tbody>
+				</table>
+				<h3>JSON Body 字段</h3>
+				<p class="muted">无</p>
+				<h3>返回示例</h3>
+				<pre>
+{
   &quot;success&quot;: true,
   &quot;code&quot;: 200,
   &quot;data&quot;: [
@@ -277,4 +1574,7 @@
   ],
   &quot;message&quot;: &quot;success&quot;
 }</pre>
-  </section></main></body></html>
+			</section>
+		</main>
+	</body>
+</html>
